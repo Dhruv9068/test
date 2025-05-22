@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import gsap from "gsap";
 
 const carNames = [
@@ -16,12 +16,13 @@ export default function CarRace() {
 
   const startRace = () => {
     if (raceHappening) return;
+
     setRaceHappening(true);
     setWinner("And they're off!");
 
-    // Reset cars to starting line
+    // Reset cars to the starting line
     carsRef.current.forEach((car) => {
-      gsap.set(car, { left: 0 });
+      if (car) gsap.set(car, { left: 50 });
     });
 
     const finishLine = window.innerWidth - 150;
@@ -46,14 +47,14 @@ export default function CarRace() {
           ease: "power1.inOut",
           onStart: () => {
             gsap.to(car, {
-              y: "+=5",
+              y: "+=3",
               duration: 0.1,
-              repeat: 6,
+              repeat: 8,
               yoyo: true,
             });
           },
         },
-        0
+        0,
       );
     });
 
@@ -62,36 +63,38 @@ export default function CarRace() {
       {
         x: "+=5",
         duration: 0.1,
-        repeat: 4,
+        repeat: 5,
         yoyo: true,
       },
-      3.5
+      3.5,
     );
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6">
-      <h1 className="text-3xl font-bold text-center text-white mb-4">
-        🚗 Car Race Game 🚗
-      </h1>
-      <button
-        onClick={startRace}
-        disabled={raceHappening}
-        className="bg-blue-600 hover:bg-blue-800 text-white font-bold py-2 px-6 rounded disabled:opacity-50 mx-auto block"
-      >
-        {raceHappening ? "Race in Progress..." : "Start Race"}
-      </button>
+    <div className="w-full max-w-4xl mx-auto mt-10">
+      <h1 className="text-3xl font-bold text-center mb-6 text-white">🏁 Car Race Game 🏁</h1>
+
+      <div className="text-center mb-4">
+        <button
+          id="start-race"
+          onClick={startRace}
+          disabled={raceHappening}
+          className="bg-blue-600 hover:bg-blue-800 text-white font-bold py-2 px-6 rounded disabled:opacity-50"
+        >
+          {raceHappening ? "Race in Progress..." : "Start Race"}
+        </button>
+      </div>
 
       <div
         ref={trackRef}
-        className="relative bg-gray-800 rounded-xl overflow-hidden p-4 h-60"
+        className="race-track-container relative bg-gray-800 p-4 rounded-xl overflow-hidden h-60"
       >
         {carNames.map((name, index) => (
           <div
             key={index}
+            className="car absolute left-[50px] top-0 flex items-center justify-center h-12 w-40 bg-yellow-300 rounded-full font-semibold text-black shadow-md"
+            style={{ top: index * 60 + 10 }}
             ref={(el) => (carsRef.current[index] = el)}
-            className="car absolute flex items-center h-12 w-28 bg-yellow-300 rounded-full text-black font-bold shadow-lg"
-            style={{ top: index * 60 }}
           >
             🏎️ {name.split(" ")[1]}
           </div>
@@ -99,7 +102,13 @@ export default function CarRace() {
         <div className="absolute right-0 top-0 bottom-0 w-2 bg-red-600"></div>
       </div>
 
-      <p className="text-center text-xl font-semibold text-green-400">{winner}</p>
+      <p
+        id="winner-display"
+        className="text-center mt-4 text-xl font-bold"
+        style={{ color: raceHappening ? "gold" : "lightgreen" }}
+      >
+        {winner}
+      </p>
     </div>
   );
 }
